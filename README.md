@@ -79,7 +79,7 @@ Gradle (macOS/Linux):
 ./gradlew clean build
 ```
 
-The Gradle JAR is written to `build/libs/GearSense-1.0.1.jar`.
+The Gradle JAR is written to `build/libs/GearSense-1.0.0.jar`.
 
 Maven is also supported:
 
@@ -87,11 +87,11 @@ Maven is also supported:
 mvn clean verify
 ```
 
-The Maven JAR is written to `target/GearSense-1.0.1.jar`.
+The Maven JAR is written to `target/GearSense-1.0.0.jar`.
 
 ## Installation
 
-1. Put `GearSense-1.0.1.jar` in the server's `plugins` directory.
+1. Put `GearSense-1.0.0.jar` in the server's `plugins` directory.
 2. Restart the server.
 3. Run `/gearsense on` and optionally `/gearsense refill`.
 
@@ -121,6 +121,9 @@ version has not been released, the workflow publishes it. Otherwise, it
 automatically increments the patch version (`1.0.1`, `1.0.2`, and so on),
 updates versioned files, runs all tests, commits the bump, creates the tag,
 builds the JAR, and publishes it as a GitHub Release.
+
+If a release was deleted but its tag remains, a manual run republishes the
+current version and safely moves that tag to the current release commit.
 
 Pushing a matching `vX.Y.Z` tag also builds and publishes that version. See
 the [GitHub Wiki](https://github.com/ShadowMX93/GearSense/wiki) for complete

@@ -1,12 +1,5 @@
 # Changelog
 
-## 1.0.1
-
-- Automatically migrates older `config.yml` files on startup.
-- Preserves existing choices and unknown custom keys while adding new settings
-  and current explanatory comments.
-- Creates a versioned backup before replacing the configuration file.
-
 ## 1.0.0
 
 - Initial public release.
@@ -23,6 +16,9 @@
 - Shift bypass, optional slot restoration, commands, permissions, and
   customizable messages.
 - Fully commented configuration separating player defaults from server rules.
+- Automatic migration of older `config.yml` files that preserves existing
+  choices and unknown custom keys, adds new settings and comments, and creates
+  a versioned backup before replacement.
 - Asynchronous GitHub release updater with admin notifications, manual checks,
   verified one-time downloads, and optional automatic downloads.
 - GitHub Actions release automation that publishes `1.0.0` first and then

@@ -34,6 +34,10 @@ If no release tag exists for the version in the project, the workflow publishes
 that version. If its tag already exists, the workflow increments the patch
 number: `1.0.1`, `1.0.2`, and so on.
 
+If a release is deleted while its tag remains, the workflow republishes the
+current version and moves that tag to the current release commit instead of
+advancing the version number.
+
 The workflow updates Maven and Gradle version files, updates documentation and
 the manifest, runs the Gradle build and tests, commits the version bump directly
 to `main`, pushes an annotated tag, and publishes the built JAR with generated

@@ -42,6 +42,8 @@ jobs:
       - name: Choose release version
         id: version
         shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           current="$(gradle -q printVersion)"
@@ -58,18 +60,27 @@ jobs:
             fi
             create_tag=false
           elif git rev-parse --verify --quiet "refs/tags/v$current" >/dev/null; then
-            IFS=. read -r major minor patch <<< "$current"
-            version="$major.$minor.$((patch + 1))"
-            create_tag=true
+            if gh release view "v$current" >/dev/null 2>&1; then
+              IFS=. read -r major minor patch <<< "$current"
+              version="$major.$minor.$((patch + 1))"
+              create_tag=true
+              replace_tag=false
+            else
+              version="$current"
+              create_tag=true
+              replace_tag=true
+            fi
           else
             version="$current"
             create_tag=true
+            replace_tag=false
           fi
 
           echo "current=$current" >> "$GITHUB_OUTPUT"
           echo "version=$version" >> "$GITHUB_OUTPUT"
           echo "tag=v$version" >> "$GITHUB_OUTPUT"
           echo "create_tag=$create_tag" >> "$GITHUB_OUTPUT"
+          echo "replace_tag=${replace_tag:-false}" >> "$GITHUB_OUTPUT"
 
       - name: Update version files
         if: steps.version.outputs.version != steps.version.outputs.current
@@ -103,10 +114,16 @@ jobs:
         env:
           TAG: ${{ steps.version.outputs.tag }}
           VERSION: ${{ steps.version.outputs.version }}
+          REPLACE_TAG: ${{ steps.version.outputs.replace_tag }}
         run: |
           set -euo pipefail
-          git tag -a "$TAG" -m "GearSense $VERSION"
-          git push origin "$TAG"
+          if [[ "$REPLACE_TAG" == "true" ]]; then
+            git tag -fa "$TAG" -m "GearSense $VERSION"
+            git push --force origin "refs/tags/$TAG"
+          else
+            git tag -a "$TAG" -m "GearSense $VERSION"
+            git push origin "$TAG"
+          fi
 
       - name: Publish GitHub Release
         shell: bash

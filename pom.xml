@@ -6,7 +6,7 @@
 
     <groupId>dev.shadowmx</groupId>
     <artifactId>gearsense</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.0</version>
     <name>GearSense</name>
     <description>Context-aware tool selection and hotbar refills for Minecraft.</description>
 
