@@ -16,8 +16,8 @@ worn piece breaks.
 
 - [Installation](Installation)
 - [Configuration](Configuration)
-- [Commands and permissions](Commands-and-Permissions)
-- [Updater and releases](Updater-and-Releases)
+- [Commands and permissions](Commands%E2%80%90and%E2%80%90Permissions)
+- [Updater and releases](Updater%E2%80%90and%E2%80%90Releases)
 
 GearSense is an independent clean-room project by ShadowMX and does not use
 versioned NMS or CraftBukkit internals.
