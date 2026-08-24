@@ -1,0 +1,81 @@
+# GearSense supports Paper and Spigot 1.18.x through 26.2 with one JAR.
+
+# ---------------------------------------------------------------------------
+# PLAYER DEFAULTS AND SERVER RULES
+# ---------------------------------------------------------------------------
+# PLAYER DEFAULT: used until that player changes it with /gearsense. Their
+# choice is then saved and overrides the value here.
+# SERVER RULE: controlled only here and applies to every player.
+defaults:
+  # PLAYER DEFAULT: start automatic tool selection for new players.
+  # false = players must run /gearsense on before tools are selected.
+  enabled: false
+
+  # PLAYER DEFAULT: refill an empty held slot with the same usable item.
+  # The replacement is taken from the player's main inventory.
+  refill: false
+
+  # PLAYER DEFAULT: equip matching armor when worn armor breaks.
+  # Armor replacements are searched for across the entire inventory.
+  # Players can toggle this independently with /gearsense armor.
+  armor-replacement: true
+
+  # PLAYER DEFAULT: return to the slot held before tool selection.
+  # This is ignored while sticky-tool is true.
+  restore-slot: false
+
+  # SERVER RULE: let Shift temporarily prevent automatic tool changes.
+  shift-bypass: true
+
+  # SERVER RULE: choose where GearSense searches for tools.
+  # false = search only hotbar slots 1-9.
+  # true = also search the main inventory and move a tool into the hand.
+  search-entire-inventory: false
+
+  # SERVER RULE: avoid a NEW tool with this many uses or fewer left.
+  # A tool already in use is still kept until it breaks in sticky mode.
+  durability-reserve: 3
+
+  # PLAYER DEFAULT: choose how a NEW tool is ranked among valid tools.
+  # Options: NONE, SPEED, FORTUNE, SILK_TOUCH, or DURABILITY.
+  # The currently active tool is not replaced just for a preference change.
+  preference: NONE
+
+# Keep using a valid selected tool until it breaks or the block needs a
+# different tool. This prevents swapping between duplicates on every block.
+# After it breaks, the next matching tool is moved into the same hotbar slot.
+sticky-tool: true
+
+# How long to wait after the last block interaction before restoring the
+# player's original slot. Only used when sticky-tool is false and that player
+# has restore-slot enabled.
+restore-delay-ticks: 8
+
+# Blocks on this list never trigger automatic tool selection.
+# Use Bukkit/Paper material names in uppercase, one block per line.
+ignored-blocks:
+  - TORCH
+  - WALL_TORCH
+  - REDSTONE_TORCH
+  - REDSTONE_WALL_TORCH
+  - TRIPWIRE
+
+# ---------------------------------------------------------------------------
+# PLAYER MESSAGES
+# ---------------------------------------------------------------------------
+# Use & color codes. Set a message to '' if you do not want it displayed.
+messages:
+  prefix: '&8[&bGearSense&8] '
+  enabled: '&aAutomatic tool selection enabled.'
+  disabled: '&cAutomatic tool selection disabled.'
+  refill-enabled: '&aAutomatic refill enabled.'
+  refill-disabled: '&cAutomatic refill disabled.'
+  armor-enabled: '&aAutomatic armor replacement enabled.'
+  armor-disabled: '&cAutomatic armor replacement disabled.'
+  restore-enabled: '&aSlot restoration enabled.'
+  restore-disabled: '&cSlot restoration disabled.'
+  locked: '&eYour current slot is locked.'
+  unlocked: '&aYour current slot is unlocked.'
+  preference: '&aTool preference set to &f%preference%&a.'
+  reloaded: '&aConfiguration reloaded.'
+  no-permission: '&cYou do not have permission to do that.'

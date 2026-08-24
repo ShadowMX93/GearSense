@@ -1,0 +1,25 @@
+name: GearSense
+version: '${project.version}'
+main: dev.shadowmx.gearsense.GearSensePlugin
+api-version: '1.18'
+author: ShadowMX
+description: Context-aware tool selection and hotbar refills.
+website: https://github.com/ShadowMX/GearSense
+commands:
+  gearsense:
+    description: Configure GearSense.
+    usage: /gearsense [on|off|status|refill|armor|restore|lock|prefer|reload]
+    aliases: [gsense, gs]
+permissions:
+  gearsense.use:
+    description: Use automatic tool selection.
+    default: true
+  gearsense.refill:
+    description: Use automatic hotbar refills.
+    default: true
+  gearsense.armor:
+    description: Automatically equip matching armor when worn armor breaks.
+    default: true
+  gearsense.admin:
+    description: Reload GearSense configuration.
+    default: op
