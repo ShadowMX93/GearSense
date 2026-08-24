@@ -30,7 +30,7 @@ it with a command. Player choices are stored persistently.
 ## Updater settings
 
 The `updater` section controls asynchronous GitHub checks. `auto-download` is
-off by default. See [Updater and releases](Updater-and-Releases) before enabling
+off by default. See [Updater and releases](Updater%E2%80%90and%E2%80%90Releases) before enabling
 it.
 
 All material names in `ignored-blocks` must use uppercase Bukkit/Paper material
