@@ -14,16 +14,19 @@ import java.util.List;
 import java.util.Locale;
 
 public final class GearCommand implements CommandExecutor, TabCompleter {
-    private static final List<String> ROOT = List.of("on", "off", "status", "refill", "armor", "restore", "lock", "prefer", "reload");
+    private static final List<String> ROOT = List.of("on", "off", "status", "refill", "armor", "restore", "lock", "prefer", "update", "reload");
+    private static final List<String> UPDATE_ACTIONS = List.of("status", "check", "download");
     private static final List<String> PREFERENCES = List.of("none", "speed", "fortune", "silk-touch", "durability");
     private final GearSensePlugin plugin;
     private final SettingsStore store;
     private final GearListener listener;
+    private final UpdateService updateService;
 
-    public GearCommand(GearSensePlugin plugin, SettingsStore store, GearListener listener) {
+    public GearCommand(GearSensePlugin plugin, SettingsStore store, GearListener listener, UpdateService updateService) {
         this.plugin = plugin;
         this.store = store;
         this.listener = listener;
+        this.updateService = updateService;
     }
 
     @Override
@@ -35,8 +38,19 @@ public final class GearCommand implements CommandExecutor, TabCompleter {
             sender.sendMessage(plugin.message("reloaded"));
             return true;
         }
+        if (sub.equals("update")) {
+            if (!sender.hasPermission("gearsense.update")) return denied(sender);
+            String action = args.length < 2 ? "status" : args[1].toLowerCase(Locale.ROOT);
+            switch (action) {
+                case "status" -> updateService.sendStatus(sender);
+                case "check" -> updateService.checkNow(sender, false);
+                case "download" -> updateService.checkNow(sender, true);
+                default -> sender.sendMessage(ChatColor.YELLOW + "Usage: /" + label + " update <status|check|download>");
+            }
+            return true;
+        }
         if (!(sender instanceof Player player)) {
-            sender.sendMessage(ChatColor.RED + "Player-only command. Console may use /gearsense reload.");
+            sender.sendMessage(ChatColor.RED + "Player-only command. Console may use /gearsense reload or /gearsense update.");
             return true;
         }
         if (!player.hasPermission("gearsense.use")) return denied(sender);
@@ -115,6 +129,7 @@ public final class GearCommand implements CommandExecutor, TabCompleter {
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) return filter(ROOT, args[0]);
         if (args.length == 2 && args[0].equalsIgnoreCase("prefer")) return filter(PREFERENCES, args[1]);
+        if (args.length == 2 && args[0].equalsIgnoreCase("update")) return filter(UPDATE_ACTIONS, args[1]);
         return Collections.emptyList();
     }
 

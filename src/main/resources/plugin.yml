@@ -8,7 +8,7 @@ website: https://github.com/ShadowMX/GearSense
 commands:
   gearsense:
     description: Configure GearSense.
-    usage: /gearsense [on|off|status|refill|armor|restore|lock|prefer|reload]
+    usage: /gearsense [on|off|status|refill|armor|restore|lock|prefer|update|reload]
     aliases: [gsense, gs]
 permissions:
   gearsense.use:
@@ -22,4 +22,7 @@ permissions:
     default: true
   gearsense.admin:
     description: Reload GearSense configuration.
+    default: op
+  gearsense.update:
+    description: Check, inspect, and download GearSense updates.
     default: op

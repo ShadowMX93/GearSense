@@ -51,6 +51,32 @@ sticky-tool: true
 # has restore-slot enabled.
 restore-delay-ticks: 8
 
+# ---------------------------------------------------------------------------
+# GITHUB UPDATER (SERVER RULES)
+# ---------------------------------------------------------------------------
+# Checks the official ShadowMX93/GearSense GitHub Releases page. Update checks
+# run asynchronously and never pause the Minecraft server thread.
+updater:
+  # Enable automatic update checks. Admins can still run
+  # /gearsense update check when this is false.
+  enabled: true
+
+  # Check shortly after startup. When false, the first automatic check waits
+  # for check-interval-hours.
+  check-on-startup: true
+
+  # Time between automatic checks. Minimum: 1 hour.
+  check-interval-hours: 12
+
+  # Tell online players with gearsense.update when a newer release is known.
+  notify-admins: true
+
+  # false = only notify; the admin downloads and installs the release.
+  # true = download the verified GearSense JAR into plugins/update. Bukkit
+  # installs it on the next full server restart; the server is never restarted
+  # automatically. You can also download once with /gearsense update download.
+  auto-download: false
+
 # Blocks on this list never trigger automatic tool selection.
 # Use Bukkit/Paper material names in uppercase, one block per line.
 ignored-blocks:
@@ -79,3 +105,10 @@ messages:
   preference: '&aTool preference set to &f%preference%&a.'
   reloaded: '&aConfiguration reloaded.'
   no-permission: '&cYou do not have permission to do that.'
+  update-checking: '&7Checking GitHub Releases for a GearSense update...'
+  update-already-checking: '&eAn update check is already running.'
+  update-not-checked: '&eNo update check has completed yet.'
+  update-current: '&aGearSense %version% is the latest release.'
+  update-available: '&eGearSense %latest% is available (installed: %current%). &f%url%'
+  update-ready: '&aGearSense %latest% was downloaded. Restart the server to install it.'
+  update-check-failed: '&cUpdate check failed: %error%'

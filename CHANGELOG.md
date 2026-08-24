@@ -16,3 +16,9 @@
 - Shift bypass, optional slot restoration, commands, permissions, and
   customizable messages.
 - Fully commented configuration separating player defaults from server rules.
+- Asynchronous GitHub release updater with admin notifications, manual checks,
+  verified one-time downloads, and optional automatic downloads.
+- GitHub Actions release automation that publishes `1.0.0` first and then
+  advances patch versions (`1.0.1`, `1.0.2`, and so on).
+- Installation, configuration, updater, command, and release documentation for
+  the GitHub Wiki.

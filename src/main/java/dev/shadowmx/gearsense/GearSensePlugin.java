@@ -16,6 +16,7 @@ public final class GearSensePlugin extends JavaPlugin {
     private int restoreDelayTicks;
     private boolean shiftBypass;
     private boolean stickyTool;
+    private UpdateService updateService;
 
     @Override
     public void onEnable() {
@@ -26,17 +27,28 @@ public final class GearSensePlugin extends JavaPlugin {
         GearListener listener = new GearListener(this, store, new ToolSelector());
         getServer().getPluginManager().registerEvents(listener, this);
 
+        updateService = new UpdateService(this);
+        getServer().getPluginManager().registerEvents(updateService, this);
+        updateService.start();
+
         PluginCommand command = getCommand("gearsense");
         if (command == null) {
             throw new IllegalStateException("Command 'gearsense' is missing from plugin.yml");
         }
-        GearCommand executor = new GearCommand(this, store, listener);
+        GearCommand executor = new GearCommand(this, store, listener, updateService);
         command.setExecutor(executor);
         command.setTabCompleter(executor);
 
         getLogger().info("GearSense " + getDescription().getVersion() + " enabled on "
                 + getServer().getName() + " " + getServer().getBukkitVersion()
                 + " (supported range: 1.18.x - 26.2).");
+    }
+
+    @Override
+    public void onDisable() {
+        if (updateService != null) {
+            updateService.stop();
+        }
     }
 
     public void reloadLocalConfiguration() {
@@ -54,6 +66,10 @@ public final class GearSensePlugin extends JavaPlugin {
             }
         }
         ignoredBlocks = Collections.unmodifiableSet(parsed);
+
+        if (updateService != null) {
+            updateService.restart();
+        }
     }
 
     public Set<Material> getIgnoredBlocks() {
@@ -74,7 +90,20 @@ public final class GearSensePlugin extends JavaPlugin {
 
     public String message(String key) {
         String prefix = getConfig().getString("messages.prefix", "&8[&bGearSense&8] ");
-        String value = getConfig().getString("messages." + key, key);
+        String value = getConfig().getString("messages." + key, defaultMessage(key));
         return ChatColor.translateAlternateColorCodes('&', prefix + value);
+    }
+
+    private static String defaultMessage(String key) {
+        return switch (key) {
+            case "update-checking" -> "&7Checking GitHub Releases for a GearSense update...";
+            case "update-already-checking" -> "&eAn update check is already running.";
+            case "update-not-checked" -> "&eNo update check has completed yet.";
+            case "update-current" -> "&aGearSense %version% is the latest release.";
+            case "update-available" -> "&eGearSense %latest% is available (installed: %current%). &f%url%";
+            case "update-ready" -> "&aGearSense %latest% was downloaded. Restart the server to install it.";
+            case "update-check-failed" -> "&cUpdate check failed: %error%";
+            default -> key;
+        };
     }
 }

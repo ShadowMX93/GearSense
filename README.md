@@ -41,6 +41,7 @@ Paper 1.18.2 build 388 and Paper 26.2 build 117.
 - Automatic hotbar refill.
 - Persistent per-player settings stored in Bukkit PDC.
 - Configurable ignored blocks and messages.
+- Asynchronous GitHub release checks with optional verified auto-downloads.
 - No NMS, packets, or external runtime dependencies.
 
 ## Commands
@@ -55,17 +56,36 @@ Paper 1.18.2 build 388 and Paper 26.2 build 117.
 | `/gearsense restore` | Toggle restoration of the previous slot. |
 | `/gearsense lock` | Lock/unlock the selected slot. |
 | `/gearsense prefer <mode>` | Choose none, speed, fortune, silk-touch, or durability. |
+| `/gearsense update status` | Show the result of the latest release check (admin). |
+| `/gearsense update check` | Check GitHub Releases immediately (admin). |
+| `/gearsense update download` | Check and download a newer JAR for the next restart (admin). |
 | `/gearsense reload` | Reload configuration (admin). |
 
 Aliases: `/gsense` and `/gs`.
 
 ## Build
 
+Gradle (Windows):
+
+```bat
+gradle.bat clean build
+```
+
+Gradle (macOS/Linux):
+
+```bash
+./gradlew clean build
+```
+
+The Gradle JAR is written to `build/libs/GearSense-1.0.0.jar`.
+
+Maven is also supported:
+
 ```bash
 mvn clean verify
 ```
 
-The distributable JAR is written to `target/GearSense-1.0.0.jar`.
+The Maven JAR is written to `target/GearSense-1.0.0.jar`.
 
 ## Installation
 
@@ -74,3 +94,26 @@ The distributable JAR is written to `target/GearSense-1.0.0.jar`.
 3. Run `/gearsense on` and optionally `/gearsense refill`.
 
 Do not use Bukkit `/reload`; restart the server when replacing the JAR.
+
+## Updater
+
+The updater checks only the official
+[`ShadowMX93/GearSense`](https://github.com/ShadowMX93/GearSense/releases)
+GitHub Releases feed. Checks run asynchronously. By default GearSense only
+notifies admins; set `updater.auto-download: true` to download a newer release
+JAR to `plugins/update`. Bukkit installs that JAR on the next full restart.
+
+Downloaded files are accepted only when they come from the official GitHub
+release URL and contain a valid GearSense `plugin.yml` with the expected
+release version.
+
+## Releases
+
+Open **Actions → Release GearSense → Run workflow**. The first run publishes
+the current `1.0.0`. Later runs automatically increment the patch version
+(`1.0.1`, `1.0.2`, and so on), update versioned files, run all tests, commit
+the bump, create the tag, build the JAR, and publish it as a GitHub Release.
+
+Pushing a matching `vX.Y.Z` tag also builds and publishes that version. See
+the [GitHub Wiki](https://github.com/ShadowMX93/GearSense/wiki) for complete
+setup and operation details.

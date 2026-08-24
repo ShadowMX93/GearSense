@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+}
+
+group = 'dev.shadowmx'
+version = '1.0.0'
+
+repositories {
+    mavenCentral()
+    maven {
+        name = 'spigotmc-snapshots'
+        url = 'https://hub.spigotmc.org/nexus/content/repositories/snapshots/'
+    }
+}
+
+dependencies {
+    compileOnly 'org.spigotmc:spigot-api:1.18.2-R0.1-SNAPSHOT'
+    testImplementation 'org.junit.jupiter:junit-jupiter:5.11.4'
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(17)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = 'UTF-8'
+    options.release = 17
+}
+
+processResources {
+    filesMatching('plugin.yml') {
+        filter { line -> line.replace('${project.version}', project.version.toString()) }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
+
+jar {
+    archiveFileName = "GearSense-${project.version}.jar"
+    manifest {
+        attributes(
+                'Implementation-Title': 'GearSense',
+                'Implementation-Version': project.version
+        )
+    }
+}
+
+tasks.register('printVersion') {
+    doLast {
+        println project.version
+    }
+}
