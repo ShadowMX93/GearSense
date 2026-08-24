@@ -3,6 +3,13 @@
 GearSense creates `plugins/GearSense/config.yml` on first start. Run
 `/gearsense reload` after editing it.
 
+## Automatic migration
+
+When a plugin update introduces configuration options, GearSense upgrades an
+existing `config.yml` during startup. It keeps all existing choices and unknown
+custom keys, adds the latest settings and explanations, and saves the previous
+file beside it as `config.yml.vN.backup`. Never edit `config-version` manually.
+
 ## Player defaults
 
 Values under `defaults` initialize a player's setting until that player changes

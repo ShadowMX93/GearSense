@@ -3,7 +3,7 @@
 1. Download `GearSense-X.Y.Z.jar` from the repository's **Releases** page.
 2. Put the JAR in the Minecraft server's `plugins` directory.
 3. Start or fully restart the server.
-4. Confirm that `GearSense 1.0.0 enabled` appears in the console.
+4. Confirm that `GearSense X.Y.Z enabled` appears in the console.
 5. Players can run `/gearsense on` to enable automatic tool selection.
 
 Do not use Bukkit `/reload` to replace the plugin JAR. Stop and restart the

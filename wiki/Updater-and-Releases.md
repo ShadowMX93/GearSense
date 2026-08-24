@@ -31,8 +31,8 @@ names GearSense, and its embedded version matches the release tag.
 4. Choose **Run workflow**.
 
 If no release tag exists for the version in the project, the workflow publishes
-that version. This makes the first release `1.0.0`. On later runs it increments
-the patch number: `1.0.1`, `1.0.2`, and so on.
+that version. If its tag already exists, the workflow increments the patch
+number: `1.0.1`, `1.0.2`, and so on.
 
 The workflow updates Maven and Gradle version files, updates documentation and
 the manifest, runs the Gradle build and tests, commits the version bump directly

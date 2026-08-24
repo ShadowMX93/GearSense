@@ -21,6 +21,7 @@ public final class GearSensePlugin extends JavaPlugin {
     @Override
     public void onEnable() {
         saveDefaultConfig();
+        ConfigMigrator.migrate(this);
         reloadLocalConfiguration();
 
         SettingsStore store = new SettingsStore(this);

@@ -4,7 +4,7 @@ main: dev.shadowmx.gearsense.GearSensePlugin
 api-version: '1.18'
 author: ShadowMX
 description: Context-aware tool selection and hotbar refills.
-website: https://github.com/ShadowMX/GearSense
+website: https://github.com/ShadowMX93/GearSense
 commands:
   gearsense:
     description: Configure GearSense.

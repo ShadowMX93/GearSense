@@ -1,4 +1,7 @@
 # GearSense supports Paper and Spigot 1.18.x through 26.2 with one JAR.
+# Used internally to add new settings and comments without replacing your
+# existing choices. Do not change this value manually.
+config-version: 1
 
 # ---------------------------------------------------------------------------
 # PLAYER DEFAULTS AND SERVER RULES

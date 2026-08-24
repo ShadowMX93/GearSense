@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.0.1
+
+- Automatically migrates older `config.yml` files on startup.
+- Preserves existing choices and unknown custom keys while adding new settings
+  and current explanatory comments.
+- Creates a versioned backup before replacing the configuration file.
+
 ## 1.0.0
 
 - Initial public release.

@@ -41,6 +41,8 @@ Paper 1.18.2 build 388 and Paper 26.2 build 117.
 - Automatic hotbar refill.
 - Persistent per-player settings stored in Bukkit PDC.
 - Configurable ignored blocks and messages.
+- Automatic versioned config migration that preserves existing choices and
+  creates a backup before adding newly documented options.
 - Asynchronous GitHub release checks with optional verified auto-downloads.
 - No NMS, packets, or external runtime dependencies.
 
@@ -77,7 +79,7 @@ Gradle (macOS/Linux):
 ./gradlew clean build
 ```
 
-The Gradle JAR is written to `build/libs/GearSense-1.0.0.jar`.
+The Gradle JAR is written to `build/libs/GearSense-1.0.1.jar`.
 
 Maven is also supported:
 
@@ -85,15 +87,20 @@ Maven is also supported:
 mvn clean verify
 ```
 
-The Maven JAR is written to `target/GearSense-1.0.0.jar`.
+The Maven JAR is written to `target/GearSense-1.0.1.jar`.
 
 ## Installation
 
-1. Put `GearSense-1.0.0.jar` in the server's `plugins` directory.
+1. Put `GearSense-1.0.1.jar` in the server's `plugins` directory.
 2. Restart the server.
 3. Run `/gearsense on` and optionally `/gearsense refill`.
 
 Do not use Bukkit `/reload`; restart the server when replacing the JAR.
+
+When an update introduces configuration options, GearSense upgrades the file
+on startup. Existing values and unknown custom keys are kept, the latest
+comments are added, and the previous file is saved beside it as a versioned
+`config.yml.vN.backup` file.
 
 ## Updater
 
@@ -109,10 +116,11 @@ release version.
 
 ## Releases
 
-Open **Actions → Release GearSense → Run workflow**. The first run publishes
-the current `1.0.0`. Later runs automatically increment the patch version
-(`1.0.1`, `1.0.2`, and so on), update versioned files, run all tests, commit
-the bump, create the tag, build the JAR, and publish it as a GitHub Release.
+Open **Actions → Release GearSense → Run workflow**. If the current project
+version has not been released, the workflow publishes it. Otherwise, it
+automatically increments the patch version (`1.0.1`, `1.0.2`, and so on),
+updates versioned files, runs all tests, commits the bump, creates the tag,
+builds the JAR, and publishes it as a GitHub Release.
 
 Pushing a matching `vX.Y.Z` tag also builds and publishes that version. See
 the [GitHub Wiki](https://github.com/ShadowMX93/GearSense/wiki) for complete
