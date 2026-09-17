@@ -16,6 +16,7 @@ public final class GearSensePlugin extends JavaPlugin {
     private int restoreDelayTicks;
     private boolean shiftBypass;
     private boolean stickyTool;
+    private boolean debugEnabled;
     private UpdateService updateService;
 
     @Override
@@ -57,6 +58,7 @@ public final class GearSensePlugin extends JavaPlugin {
         restoreDelayTicks = Math.max(0, getConfig().getInt("restore-delay-ticks", 8));
         shiftBypass = getConfig().getBoolean("defaults.shift-bypass", true);
         stickyTool = getConfig().getBoolean("sticky-tool", true);
+        debugEnabled = getConfig().getBoolean("debug", false);
         EnumSet<Material> parsed = EnumSet.noneOf(Material.class);
         for (String name : getConfig().getStringList("ignored-blocks")) {
             Material material = Material.matchMaterial(name);
@@ -67,6 +69,10 @@ public final class GearSensePlugin extends JavaPlugin {
             }
         }
         ignoredBlocks = Collections.unmodifiableSet(parsed);
+
+        if (debugEnabled) {
+            getLogger().info("[debug] Debug logging is enabled.");
+        }
 
         if (updateService != null) {
             updateService.restart();
@@ -87,6 +93,11 @@ public final class GearSensePlugin extends JavaPlugin {
 
     public boolean isStickyTool() {
         return stickyTool;
+    }
+
+    public void debug(org.bukkit.entity.Player player, String detail) {
+        if (!debugEnabled) return;
+        getLogger().info("[debug] player=" + player.getName() + " uuid=" + player.getUniqueId() + ' ' + detail);
     }
 
     public String message(String key) {

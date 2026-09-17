@@ -11,9 +11,14 @@ import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.Locale;
 import java.util.OptionalInt;
+import java.util.function.Consumer;
 
 public final class ToolSelector {
     public OptionalInt select(Player player, Block block, PlayerSettings settings) {
+        return select(player, block, settings, ignored -> { });
+    }
+
+    OptionalInt select(Player player, Block block, PlayerSettings settings, Consumer<String> debug) {
         PlayerInventory inventory = player.getInventory();
         int heldSlot = inventory.getHeldItemSlot();
         ItemStack heldItem = inventory.getItem(heldSlot);
@@ -22,7 +27,13 @@ public final class ToolSelector {
         // Block-damage events can fire when a combat swing passes a nearby
         // block, so searching the inventory here would interrupt combat by
         // unexpectedly equipping a shovel, pickaxe, or axe.
-        if (heldItem == null || heldItem.getType().isAir() || isCombatItem(heldItem.getType())) {
+        if (heldItem == null || heldItem.getType().isAir()) {
+            debug.accept("selection skipped reason=empty-hand held-slot=" + heldSlot);
+            return OptionalInt.empty();
+        }
+        if (isCombatItem(heldItem.getType())) {
+            debug.accept("selection skipped reason=combat-item held-slot=" + heldSlot
+                    + " held-item=" + heldItem.getType());
             return OptionalInt.empty();
         }
 
@@ -30,6 +41,8 @@ public final class ToolSelector {
         // it. Re-ranking duplicate tools by durability on every block caused
         // visible slot bouncing and prevented a worn tool from being finished.
         if (isTool(heldItem.getType()) && block.isPreferredTool(heldItem)) {
+            debug.accept("selection kept held tool slot=" + heldSlot + " item=" + heldItem.getType()
+                    + " reason=already-preferred");
             return OptionalInt.of(heldSlot);
         }
 
@@ -44,11 +57,13 @@ public final class ToolSelector {
             }
 
             ToolScore score = score(slot, item, block, settings.preference());
+            boolean durabilitySafe = isDurabilitySafe(item, settings.durabilityReserve());
+            debug.accept("candidate slot=" + slot + " item=" + item.getType()
+                    + " durability-safe=" + durabilitySafe + " score=" + score);
             if (bestUnsafe == null || score.compareTo(bestUnsafe) > 0) {
                 bestUnsafe = score;
             }
-            if (isDurabilitySafe(item, settings.durabilityReserve())
-                    && (best == null || score.compareTo(best) > 0)) {
+            if (durabilitySafe && (best == null || score.compareTo(best) > 0)) {
                 best = score;
             }
         }
@@ -56,8 +71,10 @@ public final class ToolSelector {
         // A nearly-broken tool is used only if it is the only viable choice.
         ToolScore selected = best != null ? best : bestUnsafe;
         if (selected == null || !selected.preferredTool()) {
+            debug.accept("selection skipped reason=no-preferred-tool");
             return OptionalInt.empty();
         }
+        debug.accept("selection chose slot=" + selected.slot() + " score=" + selected);
         return OptionalInt.of(selected.slot());
     }
 

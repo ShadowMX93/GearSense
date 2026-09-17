@@ -41,6 +41,7 @@ Paper 1.18.2 build 388 and Paper 26.2 build 117.
 - Automatic hotbar refill.
 - Persistent per-player settings stored in Bukkit PDC.
 - Configurable ignored blocks and messages.
+- Optional console debug logging for tool-selection decisions and restoration.
 - Automatic versioned config migration that preserves existing choices and
   creates a backup before adding newly documented options.
 - Asynchronous GitHub release checks with optional verified auto-downloads.

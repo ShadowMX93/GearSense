@@ -1,7 +1,7 @@
 # GearSense supports Paper and Spigot 1.18.x through 26.2 with one JAR.
 # Used internally to add new settings and comments without replacing your
 # existing choices. Do not change this value manually.
-config-version: 1
+config-version: 2
 
 # ---------------------------------------------------------------------------
 # PLAYER DEFAULTS AND SERVER RULES
@@ -48,6 +48,10 @@ defaults:
 # different tool. This prevents swapping between duplicates on every block.
 # After it breaks, the next matching tool is moved into the same hotbar slot.
 sticky-tool: true
+
+# Write detailed automatic tool-selection decisions to the server console.
+# Useful for diagnosing unexpected switches. Leave false during normal use.
+debug: false
 
 # How long to wait after the last block interaction before restoring the
 # player's original slot. Only used when sticky-tool is false and that player

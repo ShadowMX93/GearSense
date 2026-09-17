@@ -43,29 +43,59 @@ public final class GearListener implements Listener {
     @EventHandler(priority = EventPriority.HIGH, ignoreCancelled = true)
     public void onBlockDamage(BlockDamageEvent event) {
         Player player = event.getPlayer();
-        if (!canUse(player)) return;
-        PlayerSettings settings = settingsStore.get(player);
-        if (!settings.enabled() || settings.locked()) return;
-        if (plugin.isShiftBypass() && player.isSneaking()) return;
-
         Block block = event.getBlock();
+        PlayerInventory inventory = player.getInventory();
+        int heldSlot = inventory.getHeldItemSlot();
+        ItemStack heldItem = inventory.getItem(heldSlot);
+        plugin.debug(player, "block-damage block=" + block.getType()
+                + " location=" + block.getWorld().getName() + ':' + block.getX() + ',' + block.getY() + ',' + block.getZ()
+                + " held-slot=" + heldSlot + " held-item=" + itemType(heldItem));
+
+        if (!player.hasPermission("gearsense.use")) {
+            plugin.debug(player, "selection skipped reason=missing-permission");
+            return;
+        }
+        if (player.getGameMode() == GameMode.CREATIVE || player.getGameMode() == GameMode.SPECTATOR) {
+            plugin.debug(player, "selection skipped reason=game-mode mode=" + player.getGameMode());
+            return;
+        }
+        PlayerSettings settings = settingsStore.get(player);
+        if (!settings.enabled()) {
+            plugin.debug(player, "selection skipped reason=disabled");
+            return;
+        }
+        if (settings.locked()) {
+            plugin.debug(player, "selection skipped reason=slot-locked");
+            return;
+        }
+        if (plugin.isShiftBypass() && player.isSneaking()) {
+            plugin.debug(player, "selection skipped reason=shift-bypass");
+            return;
+        }
+
         Set<Material> ignored = plugin.getIgnoredBlocks();
-        if (ignored.contains(block.getType())) return;
+        if (ignored.contains(block.getType())) {
+            plugin.debug(player, "selection skipped reason=ignored-block block=" + block.getType());
+            return;
+        }
 
         SwapState previous = swaps.get(player.getUniqueId());
         if (previous != null && previous.movedFromInventory()) {
+            plugin.debug(player, "restoring previous inventory swap before new selection");
             restore(player);
         }
 
-        OptionalInt selected = selector.select(player, block, settings);
+        OptionalInt selected = selector.select(player, block, settings, detail -> plugin.debug(player, detail));
         if (selected.isEmpty()) return;
         int selectedSlot = selected.getAsInt();
-        PlayerInventory inventory = player.getInventory();
-        int heldSlot = inventory.getHeldItemSlot();
+        heldSlot = inventory.getHeldItemSlot();
 
         if (selectedSlot > 8) {
             ItemStack selectedItem = inventory.getItem(selectedSlot);
-            ItemStack heldItem = inventory.getItem(heldSlot);
+            heldItem = inventory.getItem(heldSlot);
+            plugin.debug(player, "moving inventory tool source-slot=" + selectedSlot
+                    + " target-slot=" + heldSlot + " selected-item=" + itemType(selectedItem)
+                    + " displaced-item=" + itemType(heldItem));
             inventory.setItem(heldSlot, selectedItem);
             inventory.setItem(selectedSlot, heldItem);
             swaps.put(player.getUniqueId(), new SwapState(
@@ -78,11 +108,16 @@ public final class GearListener implements Listener {
             ));
             return;
         }
-        if (selectedSlot == heldSlot) return;
+        if (selectedSlot == heldSlot) {
+            plugin.debug(player, "selection made no slot change slot=" + heldSlot);
+            return;
+        }
 
         SwapState existing = swaps.remove(player.getUniqueId());
         int originalSlot = existing == null ? heldSlot : existing.originalSlot();
         if (existing != null && existing.restoreTask() != null) existing.restoreTask().cancel();
+        plugin.debug(player, "switching hotbar original-slot=" + originalSlot + " from-slot=" + heldSlot
+                + " to-slot=" + selectedSlot + " sticky=" + plugin.isStickyTool());
         inventory.setHeldItemSlot(selectedSlot);
         if (plugin.isStickyTool()) return;
         swaps.put(player.getUniqueId(), new SwapState(originalSlot, selectedSlot, -1, null, null, null));
@@ -154,13 +189,10 @@ public final class GearListener implements Listener {
 
     public void cancelRestore(Player player) {
         SwapState state = swaps.remove(player.getUniqueId());
-        if (state != null && state.restoreTask() != null) state.restoreTask().cancel();
-    }
-
-    private boolean canUse(Player player) {
-        return player.hasPermission("gearsense.use")
-                && player.getGameMode() != GameMode.CREATIVE
-                && player.getGameMode() != GameMode.SPECTATOR;
+        if (state != null) {
+            if (state.restoreTask() != null) state.restoreTask().cancel();
+            plugin.debug(player, "cancelled pending slot restoration");
+        }
     }
 
     private void scheduleRestore(Player player) {
@@ -168,6 +200,8 @@ public final class GearListener implements Listener {
         if (state == null) return;
         if (state.restoreTask() != null) state.restoreTask().cancel();
         int delay = plugin.getRestoreDelayTicks();
+        plugin.debug(player, "scheduled slot restoration delay-ticks=" + delay
+                + " original-slot=" + state.originalSlot() + " selected-slot=" + state.selectedToolSlot());
         BukkitTask task = plugin.getServer().getScheduler().runTaskLater(plugin, () -> restore(player), Math.max(0, delay));
         swaps.put(player.getUniqueId(), new SwapState(
                 state.originalSlot(), state.selectedToolSlot(), state.inventorySourceSlot(),
@@ -186,9 +220,17 @@ public final class GearListener implements Listener {
                     && sameIdentityIgnoringDamage(source, state.displacedItem())) {
                 inventory.setItem(state.originalSlot(), source);
                 inventory.setItem(state.inventorySourceSlot(), held);
+                plugin.debug(player, "restored inventory swap held-slot=" + state.originalSlot()
+                        + " source-slot=" + state.inventorySourceSlot());
+            } else {
+                plugin.debug(player, "restore skipped reason=inventory-items-changed");
             }
         } else if (player.getInventory().getHeldItemSlot() == state.selectedToolSlot()) {
             player.getInventory().setHeldItemSlot(state.originalSlot());
+            plugin.debug(player, "restored hotbar slot=" + state.originalSlot());
+        } else {
+            plugin.debug(player, "restore skipped reason=player-changed-slot current-slot="
+                    + player.getInventory().getHeldItemSlot());
         }
     }
 
@@ -329,6 +371,10 @@ public final class GearListener implements Listener {
 
     private static ItemStack cloneOrNull(ItemStack item) {
         return item == null || item.getType().isAir() ? null : item.clone();
+    }
+
+    private static String itemType(ItemStack item) {
+        return item == null || item.getType().isAir() ? "AIR" : item.getType().name();
     }
 
     private static boolean sameIdentityIgnoringDamage(ItemStack first, ItemStack second) {

@@ -7,6 +7,8 @@ import org.bukkit.inventory.PlayerInventory;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Proxy;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -38,6 +40,16 @@ class ToolSelectorTest {
                     () -> combatItem + " should not trigger tool selection"
             );
         }
+    }
+
+    @Test
+    void debugExplainsCombatItemSkip() {
+        List<String> messages = new ArrayList<>();
+
+        selector.select(playerHolding(new ItemStack(Material.IRON_SWORD)), null, null, messages::add);
+
+        assertTrue(messages.stream().anyMatch(message -> message.contains("reason=combat-item")));
+        assertTrue(messages.stream().anyMatch(message -> message.contains("held-item=IRON_SWORD")));
     }
 
     private Player playerHolding(ItemStack heldItem) {
