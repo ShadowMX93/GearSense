@@ -18,11 +18,17 @@ public final class ToolSelector {
         int heldSlot = inventory.getHeldItemSlot();
         ItemStack heldItem = inventory.getItem(heldSlot);
 
+        // Treat an empty hand as an intentional player choice. Block-damage
+        // events also fire when a player punches a block, so searching the
+        // inventory here would unexpectedly equip a shovel, pickaxe, or axe.
+        if (heldItem == null || heldItem.getType().isAir()) {
+            return OptionalInt.empty();
+        }
+
         // Once GearSense has a suitable tool in the player's hand, keep using
         // it. Re-ranking duplicate tools by durability on every block caused
         // visible slot bouncing and prevented a worn tool from being finished.
-        if (heldItem != null && !heldItem.getType().isAir()
-                && isTool(heldItem.getType()) && block.isPreferredTool(heldItem)) {
+        if (isTool(heldItem.getType()) && block.isPreferredTool(heldItem)) {
             return OptionalInt.of(heldSlot);
         }
 
