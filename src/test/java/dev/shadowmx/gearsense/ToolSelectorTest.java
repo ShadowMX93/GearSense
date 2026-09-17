@@ -24,8 +24,20 @@ class ToolSelectorTest {
     }
 
     @Test
-    void doesNotSelectToolWhenPlayerIsHoldingSword() {
-        assertTrue(selector.select(playerHolding(new ItemStack(Material.IRON_SWORD)), null, null).isEmpty());
+    void doesNotSelectToolWhenPlayerIsHoldingCombatItem() {
+        Material[] combatItems = {
+                Material.IRON_SWORD,
+                Material.BOW,
+                Material.CROSSBOW,
+                Material.TRIDENT
+        };
+
+        for (Material combatItem : combatItems) {
+            assertTrue(
+                    selector.select(playerHolding(new ItemStack(combatItem)), null, null).isEmpty(),
+                    () -> combatItem + " should not trigger tool selection"
+            );
+        }
     }
 
     private Player playerHolding(ItemStack heldItem) {
