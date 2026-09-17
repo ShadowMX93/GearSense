@@ -1,6 +1,7 @@
 package dev.shadowmx.gearsense;
 
 import org.bukkit.Material;
+import org.bukkit.Tag;
 import org.bukkit.block.Block;
 import org.bukkit.enchantments.Enchantment;
 import org.bukkit.entity.Player;
@@ -49,7 +50,7 @@ public final class ToolSelector {
         // Once GearSense has a suitable tool in the player's hand, keep using
         // it. Re-ranking duplicate tools by durability on every block caused
         // visible slot bouncing and prevented a worn tool from being finished.
-        if (block.isPreferredTool(heldItem)) {
+        if (isEffectiveTool(heldItem, block)) {
             debug.accept("selection kept held tool slot=" + heldSlot + " item=" + heldItem.getType()
                     + " reason=already-preferred");
             return OptionalInt.of(heldSlot);
@@ -88,7 +89,7 @@ public final class ToolSelector {
     }
 
     ToolScore score(int slot, ItemStack item, Block block, Preference preference) {
-        boolean preferred = block.isPreferredTool(item);
+        boolean preferred = isEffectiveTool(item, block);
         int efficiency = item.getEnchantmentLevel(Enchantment.DIG_SPEED);
         int fortune = item.getEnchantmentLevel(Enchantment.LOOT_BONUS_BLOCKS);
         int silk = item.getEnchantmentLevel(Enchantment.SILK_TOUCH);
@@ -117,6 +118,20 @@ public final class ToolSelector {
         String name = material.name();
         return name.endsWith("_SWORD") || name.equals("BOW") || name.equals("CROSSBOW")
                 || name.equals("TRIDENT") || name.equals("MACE");
+    }
+
+    private static boolean isEffectiveTool(ItemStack item, Block block) {
+        Material tool = item.getType();
+        Material blockType = block.getType();
+        String toolName = tool.name();
+
+        boolean correctFamily = (toolName.endsWith("_PICKAXE") && Tag.MINEABLE_PICKAXE.isTagged(blockType))
+                || (toolName.endsWith("_AXE") && Tag.MINEABLE_AXE.isTagged(blockType))
+                || (toolName.endsWith("_SHOVEL") && Tag.MINEABLE_SHOVEL.isTagged(blockType))
+                || (toolName.endsWith("_HOE") && Tag.MINEABLE_HOE.isTagged(blockType))
+                || (tool == Material.SHEARS && toolAffinity(tool, blockType) > 0);
+
+        return correctFamily && block.isPreferredTool(item);
     }
 
     static boolean isDurabilitySafe(ItemStack item, int reserve) {
