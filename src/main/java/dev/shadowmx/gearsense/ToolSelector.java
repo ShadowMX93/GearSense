@@ -18,10 +18,11 @@ public final class ToolSelector {
         int heldSlot = inventory.getHeldItemSlot();
         ItemStack heldItem = inventory.getItem(heldSlot);
 
-        // Treat an empty hand as an intentional player choice. Block-damage
-        // events also fire when a player punches a block, so searching the
-        // inventory here would unexpectedly equip a shovel, pickaxe, or axe.
-        if (heldItem == null || heldItem.getType().isAir()) {
+        // Treat an empty hand or a sword as an intentional player choice.
+        // Block-damage events can fire when a combat swing passes a nearby
+        // block, so searching the inventory here would interrupt combat by
+        // unexpectedly equipping a shovel, pickaxe, or axe.
+        if (heldItem == null || heldItem.getType().isAir() || isSword(heldItem.getType())) {
             return OptionalInt.empty();
         }
 
@@ -84,6 +85,10 @@ public final class ToolSelector {
         String name = material.name();
         return name.endsWith("_PICKAXE") || name.endsWith("_AXE") || name.endsWith("_SHOVEL")
                 || name.endsWith("_HOE") || material == Material.SHEARS;
+    }
+
+    static boolean isSword(Material material) {
+        return material.name().endsWith("_SWORD");
     }
 
     static boolean isDurabilitySafe(ItemStack item, int reserve) {
