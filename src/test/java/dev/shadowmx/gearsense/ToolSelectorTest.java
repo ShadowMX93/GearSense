@@ -23,6 +23,11 @@ class ToolSelectorTest {
         assertTrue(selector.select(playerHolding(new ItemStack(Material.AIR)), null, null).isEmpty());
     }
 
+    @Test
+    void doesNotSelectToolWhenPlayerIsHoldingSword() {
+        assertTrue(selector.select(playerHolding(new ItemStack(Material.IRON_SWORD)), null, null).isEmpty());
+    }
+
     private Player playerHolding(ItemStack heldItem) {
         PlayerInventory inventory = proxy(PlayerInventory.class, (methodName, returnType) -> switch (methodName) {
             case "getHeldItemSlot" -> 0;
