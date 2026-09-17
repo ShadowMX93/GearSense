@@ -161,6 +161,5 @@ public final class ToolSelector {
         String name = block.name();
         return name.contains("LEAVES") || name.contains("WOOL")
                 || name.contains("VINE") || name.contains("WEB");
-
     }
 }
