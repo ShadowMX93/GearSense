@@ -80,7 +80,7 @@ Gradle (macOS/Linux):
 ./gradlew clean build
 ```
 
-The Gradle JAR is written to `build/libs/GearSense-1.0.4.jar`.
+The Gradle JAR is written to `build/libs/GearSense-1.0.5.jar`.
 
 Maven is also supported:
 
@@ -88,11 +88,11 @@ Maven is also supported:
 mvn clean verify
 ```
 
-The Maven JAR is written to `target/GearSense-1.0.4.jar`.
+The Maven JAR is written to `target/GearSense-1.0.5.jar`.
 
 ## Installation
 
-1. Put `GearSense-1.0.4.jar` in the server's `plugins` directory.
+1. Put `GearSense-1.0.5.jar` in the server's `plugins` directory.
 2. Restart the server.
 3. Run `/gearsense on` and optionally `/gearsense refill`.
 
