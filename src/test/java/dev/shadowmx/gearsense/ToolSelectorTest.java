@@ -64,6 +64,18 @@ class ToolSelectorTest {
         assertTrue(messages.stream().anyMatch(message -> message.contains("held-item=STONE")));
     }
 
+    @Test
+    void doesNotSelectToolWhenPlayerIsHoldingAnyOtherNonToolItem() {
+        List<String> messages = new ArrayList<>();
+
+        assertTrue(selector.select(
+                playerHolding(new ItemStack(Material.STICK)), null, null, messages::add
+        ).isEmpty());
+
+        assertTrue(messages.stream().anyMatch(message -> message.contains("reason=non-tool-item")));
+        assertTrue(messages.stream().anyMatch(message -> message.contains("held-item=STICK")));
+    }
+
     private Player playerHolding(ItemStack heldItem) {
         PlayerInventory inventory = proxy(PlayerInventory.class, (methodName, returnType) -> switch (methodName) {
             case "getHeldItemSlot" -> 0;
