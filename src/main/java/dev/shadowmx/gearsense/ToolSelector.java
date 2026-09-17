@@ -23,16 +23,20 @@ public final class ToolSelector {
         int heldSlot = inventory.getHeldItemSlot();
         ItemStack heldItem = inventory.getItem(heldSlot);
 
-        // Treat an empty hand or a combat item as an intentional player choice.
-        // Block-damage events can fire when a combat swing passes a nearby
-        // block, so searching the inventory here would interrupt combat by
-        // unexpectedly equipping a shovel, pickaxe, or axe.
+        // Treat an empty hand, combat item, or placeable block as an intentional
+        // player choice. Block-damage events can fire during combat or while a
+        // player is positioning blocks, and must not replace the held item.
         if (heldItem == null || heldItem.getType().isAir()) {
             debug.accept("selection skipped reason=empty-hand held-slot=" + heldSlot);
             return OptionalInt.empty();
         }
         if (isCombatItem(heldItem.getType())) {
             debug.accept("selection skipped reason=combat-item held-slot=" + heldSlot
+                    + " held-item=" + heldItem.getType());
+            return OptionalInt.empty();
+        }
+        if (heldItem.getType().isBlock()) {
+            debug.accept("selection skipped reason=placeable-block held-slot=" + heldSlot
                     + " held-item=" + heldItem.getType());
             return OptionalInt.empty();
         }
