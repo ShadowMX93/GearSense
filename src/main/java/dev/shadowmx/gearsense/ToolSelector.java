@@ -23,9 +23,9 @@ public final class ToolSelector {
         int heldSlot = inventory.getHeldItemSlot();
         ItemStack heldItem = inventory.getItem(heldSlot);
 
-        // Treat an empty hand, combat item, or placeable block as an intentional
-        // player choice. Block-damage events can fire during combat or while a
-        // player is positioning blocks, and must not replace the held item.
+        // Only switch between mining tools. Every other held item is an
+        // intentional player choice and must not be replaced by a block-damage
+        // event.
         if (heldItem == null || heldItem.getType().isAir()) {
             debug.accept("selection skipped reason=empty-hand held-slot=" + heldSlot);
             return OptionalInt.empty();
@@ -40,11 +40,16 @@ public final class ToolSelector {
                     + " held-item=" + heldItem.getType());
             return OptionalInt.empty();
         }
+        if (!isTool(heldItem.getType())) {
+            debug.accept("selection skipped reason=non-tool-item held-slot=" + heldSlot
+                    + " held-item=" + heldItem.getType());
+            return OptionalInt.empty();
+        }
 
         // Once GearSense has a suitable tool in the player's hand, keep using
         // it. Re-ranking duplicate tools by durability on every block caused
         // visible slot bouncing and prevented a worn tool from being finished.
-        if (isTool(heldItem.getType()) && block.isPreferredTool(heldItem)) {
+        if (block.isPreferredTool(heldItem)) {
             debug.accept("selection kept held tool slot=" + heldSlot + " item=" + heldItem.getType()
                     + " reason=already-preferred");
             return OptionalInt.of(heldSlot);
