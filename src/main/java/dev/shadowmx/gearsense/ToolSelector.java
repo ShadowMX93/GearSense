@@ -10,7 +10,6 @@ import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.Damageable;
 import org.bukkit.inventory.meta.ItemMeta;
 
-import java.util.Locale;
 import java.util.OptionalInt;
 import java.util.function.Consumer;
 
@@ -103,7 +102,8 @@ public final class ToolSelector {
             case SPEED -> toolTier(item.getType()) * 30 + efficiency * 15;
             case NONE -> 0;
         };
-        int speedScore = toolTier(item.getType()) * 30 + efficiency * 15 + toolAffinity(item.getType(), block.getType());
+        int speedScore = toolTier(item.getType()) * 30 + efficiency * 15;
+        if (item.getType() == Material.SHEARS && isShearsEffective(block.getType())) speedScore += 500;
         int enchantmentScore = efficiency * 4 + unbreaking + fortune + silk;
         return new ToolScore(slot, preferred, preferenceScore, speedScore, enchantmentScore, remaining);
     }
@@ -129,7 +129,7 @@ public final class ToolSelector {
                 || (toolName.endsWith("_AXE") && Tag.MINEABLE_AXE.isTagged(blockType))
                 || (toolName.endsWith("_SHOVEL") && Tag.MINEABLE_SHOVEL.isTagged(blockType))
                 || (toolName.endsWith("_HOE") && Tag.MINEABLE_HOE.isTagged(blockType))
-                || (tool == Material.SHEARS && toolAffinity(tool, blockType) > 0);
+                || (tool == Material.SHEARS && isShearsEffective(blockType));
 
         return correctFamily && block.isPreferredTool(item);
     }
@@ -157,18 +157,9 @@ public final class ToolSelector {
         return material == Material.SHEARS ? 5 : 0;
     }
 
-    private static int toolAffinity(Material tool, Material block) {
-        String toolName = tool.name();
-        String blockName = block.name().toUpperCase(Locale.ROOT);
-        if (tool == Material.SHEARS && (blockName.contains("LEAVES") || blockName.contains("WOOL")
-                || blockName.contains("VINE") || blockName.contains("WEB"))) return 500;
-        if (toolName.endsWith("_AXE") && (blockName.contains("LOG") || blockName.contains("WOOD")
-                || blockName.contains("PLANK") || blockName.contains("STEM") || blockName.contains("HYPHAE"))) return 80;
-        if (toolName.endsWith("_SHOVEL") && (blockName.contains("DIRT") || blockName.contains("SAND")
-                || blockName.contains("GRAVEL") || blockName.contains("CLAY") || blockName.contains("SNOW"))) return 80;
-        if (toolName.endsWith("_HOE") && (blockName.contains("LEAVES") || blockName.contains("WART_BLOCK")
-                || blockName.contains("SCULK") || blockName.contains("SPONGE"))) return 80;
-        if (toolName.endsWith("_PICKAXE")) return 20;
-        return 0;
+    private static boolean isShearsEffective(Material block) {
+        String name = block.name();
+        return name.contains("LEAVES") || name.contains("WOOL")
+                || name.contains("VINE") || name.contains("WEB");
     }
 }
