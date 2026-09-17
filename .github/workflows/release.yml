@@ -55,7 +55,7 @@ jobs:
           if [[ "${{ github.event_name }}" == "push" ]]; then
             version="${GITHUB_REF_NAME#v}"
             if [[ "$version" != "$current" ]]; then
-              echo "Tag $GITHUB_REF_NAME does not match pom.xml version $current" >&2
+              echo "Tag $GITHUB_REF_NAME does not match project version $current" >&2
               exit 1
             fi
             create_tag=false
@@ -91,7 +91,6 @@ jobs:
           set -euo pipefail
           sed -i -E "0,/<version>[0-9]+\.[0-9]+\.[0-9]+<\\/version>/s//<version>$NEW_VERSION<\\/version>/" pom.xml
           sed -i -E "s/^version = '[0-9]+\.[0-9]+\.[0-9]+'/version = '$NEW_VERSION'/" build.gradle
-          sed -i -E "s/^Implementation-Version: .*/Implementation-Version: $NEW_VERSION/" src/main/resources/META-INF/MANIFEST.MF
           sed -i -E "s/GearSense-[0-9]+\.[0-9]+\.[0-9]+\.jar/GearSense-$NEW_VERSION.jar/g" README.md
 
       - name: Verify build
@@ -104,7 +103,7 @@ jobs:
           NEW_VERSION: ${{ steps.version.outputs.version }}
         run: |
           set -euo pipefail
-          git add pom.xml build.gradle README.md src/main/resources/META-INF/MANIFEST.MF
+          git add pom.xml build.gradle README.md
           git commit -m "chore: release $NEW_VERSION [skip ci]"
           git push origin HEAD:main
 
