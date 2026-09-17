@@ -32,6 +32,7 @@ it with a command. Player choices are stored persistently.
 | `defaults.durability-reserve` | `3` | Avoid selecting a new tool at or below this many uses. |
 | `sticky-tool` | `true` | Keep a valid tool selected until it breaks. |
 | `restore-delay-ticks` | `8` | Delay before restoring a slot when sticky mode is off. |
+| `debug` | `false` | Log detailed tool-selection and restoration decisions to the server console. |
 | `ignored-blocks` | See config | Blocks that never trigger a tool change. |
 
 ## Updater settings

@@ -9,7 +9,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class ConfigMigratorTest {
     private static final String DEFAULTS = """
             # Current documented configuration.
-            config-version: 1
+            config-version: 2
+            debug: false
             defaults:
               # Enable the feature for new players.
               enabled: false
@@ -33,7 +34,8 @@ class ConfigMigratorTest {
         YamlConfiguration merged = new YamlConfiguration();
         merged.loadFromString(mergedText);
 
-        assertEquals(1, merged.getInt("config-version"));
+        assertEquals(2, merged.getInt("config-version"));
+        assertEquals(false, merged.getBoolean("debug"));
         assertTrue(merged.getBoolean("defaults.enabled"));
         assertTrue(merged.getBoolean("defaults.new-option"));
         assertTrue(merged.getBoolean("updater.auto-download"));

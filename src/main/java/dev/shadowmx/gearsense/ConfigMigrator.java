@@ -15,7 +15,7 @@ import java.util.Objects;
 import java.util.logging.Level;
 
 final class ConfigMigrator {
-    static final int CURRENT_VERSION = 1;
+    static final int CURRENT_VERSION = 2;
 
     private ConfigMigrator() {
     }
