@@ -52,6 +52,18 @@ class ToolSelectorTest {
         assertTrue(messages.stream().anyMatch(message -> message.contains("held-item=IRON_SWORD")));
     }
 
+    @Test
+    void doesNotSelectToolWhenPlayerIsHoldingPlaceableBlock() {
+        List<String> messages = new ArrayList<>();
+
+        assertTrue(selector.select(
+                playerHolding(new ItemStack(Material.STONE)), null, null, messages::add
+        ).isEmpty());
+
+        assertTrue(messages.stream().anyMatch(message -> message.contains("reason=placeable-block")));
+        assertTrue(messages.stream().anyMatch(message -> message.contains("held-item=STONE")));
+    }
+
     private Player playerHolding(ItemStack heldItem) {
         PlayerInventory inventory = proxy(PlayerInventory.class, (methodName, returnType) -> switch (methodName) {
             case "getHeldItemSlot" -> 0;
